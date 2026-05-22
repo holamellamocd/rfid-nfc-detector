@@ -1,0 +1,330 @@
+/* ------------------------------------------------------------------ */
+/* Variables                                                            */
+/* ------------------------------------------------------------------ */
+:root {
+  --bg:           #0d1117;
+  --surface:      #161b22;
+  --surface-2:    #1c2128;
+  --border:       #30363d;
+  --text:         #c9d1d9;
+  --muted:        #6e7681;
+  --hf:           #3fb950;
+  --lf:           #58a6ff;
+  --uhf:          #e8834b;
+  --warn:         #d29922;
+  --error:        #f85149;
+  --white:        #f0f6fc;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reset / base                                                         */
+/* ------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header                                                               */
+/* ------------------------------------------------------------------ */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .4px;
+  color: var(--white);
+}
+
+.conn-state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot.connected    { background: var(--hf); box-shadow: 0 0 6px var(--hf); }
+.dot.disconnected { background: var(--error); }
+.dot.connecting   { background: var(--warn); animation: blink 1s ease-in-out infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* ------------------------------------------------------------------ */
+/* Main layout                                                          */
+/* ------------------------------------------------------------------ */
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Empty state                                                          */
+/* ------------------------------------------------------------------ */
+.empty-state {
+  text-align: center;
+  padding: 72px 24px;
+  color: var(--muted);
+}
+
+.empty-icon { font-size: 3rem; margin-bottom: 16px; }
+.empty-state h2 { font-size: 1.1rem; font-weight: 500; margin-bottom: 8px; color: var(--text); }
+.empty-state p  { margin-bottom: 16px; }
+.empty-state code {
+  display: inline-block;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: monospace;
+  font-size: .85rem;
+  color: var(--hf);
+}
+
+/* ------------------------------------------------------------------ */
+/* Readers grid                                                         */
+/* ------------------------------------------------------------------ */
+#readers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reader card                                                          */
+/* ------------------------------------------------------------------ */
+.reader-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .35s, box-shadow .35s;
+}
+
+/* Top accent bar */
+.reader-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background .35s;
+}
+
+.reader-card.hf-active {
+  border-color: var(--hf);
+  box-shadow: 0 0 24px rgba(63,185,80,.12);
+}
+.reader-card.hf-active::before { background: var(--hf); }
+
+.reader-card.lf-active {
+  border-color: var(--lf);
+  box-shadow: 0 0 24px rgba(88,166,255,.12);
+}
+.reader-card.lf-active::before { background: var(--lf); }
+
+.reader-card.uhf-active {
+  border-color: var(--uhf);
+  box-shadow: 0 0 24px rgba(232,131,75,.12);
+}
+.reader-card.uhf-active::before { background: var(--uhf); }
+
+.reader-card.err-state {
+  border-color: var(--error);
+}
+.reader-card.err-state::before { background: var(--error); }
+
+/* Flash animation on detection */
+@keyframes card-flash {
+  0%   { filter: brightness(1); }
+  30%  { filter: brightness(1.35); }
+  100% { filter: brightness(1); }
+}
+.reader-card.flash { animation: card-flash .5s ease; }
+
+/* ---- Card header ---- */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card-icon { font-size: 1.5rem; line-height: 1; margin-top: 2px; }
+
+.card-meta { flex: 1; min-width: 0; }
+.card-name {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-port {
+  font-family: monospace;
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ---- Status row ---- */
+.card-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .78rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.status-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--muted);
+}
+
+.status-led.scanning { background: var(--warn); animation: blink 1.3s ease-in-out infinite; }
+.status-led.hf       { background: var(--hf); }
+.status-led.lf       { background: var(--lf); }
+.status-led.uhf      { background: var(--uhf); }
+.status-led.error    { background: var(--error); }
+
+/* ---- Detection body ---- */
+.card-body { min-height: 90px; }
+
+.waiting-msg {
+  color: var(--muted);
+  font-size: .82rem;
+  padding: 18px 0;
+  text-align: center;
+}
+
+.detection { display: none; }
+.detection.visible { display: block; }
+
+.freq-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.freq-badge.hf {
+  background: rgba(63,185,80,.14);
+  color: var(--hf);
+  border: 1px solid rgba(63,185,80,.3);
+}
+.freq-badge.lf {
+  background: rgba(88,166,255,.14);
+  color: var(--lf);
+  border: 1px solid rgba(88,166,255,.3);
+}
+.freq-badge.uhf {
+  background: rgba(232,131,75,.14);
+  color: var(--uhf);
+  border: 1px solid rgba(232,131,75,.3);
+}
+
+.protocol { font-size: 1.25rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+
+.uid {
+  font-family: monospace;
+  font-size: .78rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.extras {
+  margin-top: 6px;
+  font-size: .74rem;
+  color: var(--muted);
+}
+.extras span { margin-right: 10px; }
+
+.det-time {
+  margin-top: 10px;
+  font-size: .7rem;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* History section                                                      */
+/* ------------------------------------------------------------------ */
+.section-label {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.history-empty { color: var(--muted); font-size: .85rem; }
+
+#history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .84rem;
+  display: none;
+}
+#history-table.visible { display: table; }
+
+#history-table th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 500;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+#history-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+#history-table tr:hover td { background: var(--surface-2); }
+
+.t-time   { font-family: monospace; font-size: .78rem; color: var(--muted); }
+.t-freq   { font-size: .78rem; }
+.t-freq.hf  { color: var(--hf); }
+.t-freq.lf  { color: var(--lf); }
+.t-freq.uhf { color: var(--uhf); }
+.t-uid    { font-family: monospace; font-size: .78rem; color: var(--muted); }
+.t-extra  { font-size: .76rem; color: var(--muted); }

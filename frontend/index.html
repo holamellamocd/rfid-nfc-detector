@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFID / NFC Protocol Detector</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>RFID / NFC Protocol Detector</h1>
+  <div class="conn-state">
+    <span id="conn-dot" class="dot disconnected"></span>
+    <span id="conn-label">Connecting…</span>
+  </div>
+</header>
+
+<main>
+  <section id="readers-section">
+    <div id="no-readers" class="empty-state">
+      <div class="empty-icon">📡</div>
+      <h2>No readers detected</h2>
+      <p>Connect a Proxmark3 or USB NFC reader and make sure the backend is running.</p>
+      <code>cd backend &amp;&amp; python main.py</code>
+    </div>
+    <div id="readers-grid"></div>
+  </section>
+
+  <section id="history-section">
+    <h2 class="section-label">Detection History</h2>
+    <p id="history-empty" class="history-empty">No cards detected yet.</p>
+    <table id="history-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Reader</th>
+          <th>Protocol</th>
+          <th>Frequency</th>
+          <th>UID / ID</th>
+          <th>Extra</th>
+        </tr>
+      </thead>
+      <tbody id="history-body"></tbody>
+    </table>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pexpect>=4.8.0
+pyscard>=2.0.0
+mercuryapi>=1.31.3
