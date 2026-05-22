@@ -51,7 +51,7 @@ async def _broadcast_loop():
                 except Exception as exc:
                     logger.warning("send_json failed: %s", exc)
                     dead.add(client)
-            _clients -= dead
+            _clients.difference_update(dead)
     except Exception as exc:
         logger.error("Broadcast loop crashed: %s", exc, exc_info=True)
 
