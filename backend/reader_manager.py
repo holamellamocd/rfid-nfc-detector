@@ -61,8 +61,20 @@ class ReaderManager:
         for port in find_uhf_candidate_ports():
             candidates.append((port, lambda p=port: UHFReader(p)))
 
-        logger.info("Discovery found %d candidate(s): %s", len(candidates), [c[0] for c in candidates])
+        candidate_ids = {cid for cid, _ in candidates}
 
+        # Remove readers that have disappeared
+        with self._lock:
+            gone = [rid for rid in self._readers if rid not in candidate_ids]
+        for reader_id in gone:
+            with self._lock:
+                reader = self._readers.pop(reader_id, None)
+            if reader:
+                reader.close()
+                logger.info("Reader removed: %s", reader_id)
+                self._emit({"type": "reader_removed", "reader_id": reader_id})
+
+        # Add newly appeared readers
         for reader_id, factory in candidates:
             with self._lock:
                 if reader_id in self._readers:
@@ -87,6 +99,9 @@ class ReaderManager:
     def _reader_loop(self, reader):
         logger.info("Scan loop started for: %s", reader.id)
         while self._running:
+            with self._lock:
+                if reader.id not in self._readers:
+                    break
             try:
                 card = reader.scan()
                 if card:

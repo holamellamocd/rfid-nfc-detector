@@ -66,7 +66,12 @@ class PCSCReader(BaseReader):
                 raw_details={"atr": " ".join(f"{b:02X}" for b in atr)},
             )
         except Exception as exc:
-            if "No smart card" not in str(exc) and "card not present" not in str(exc).lower():
+            msg = str(exc)
+            if "No smart card" in msg or "card not present" in msg.lower():
+                pass  # normal — no card present
+            elif "Reader is unavailable" in msg or "Unknown reader specified" in msg:
+                self._reader = None  # reader gone — stop trying until re-resolved
+            else:
                 logger.warning("PCSC scan error on %s: %s", self._reader_name, exc)
             return None
 
