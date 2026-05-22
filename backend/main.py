@@ -35,14 +35,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+logger = logging.getLogger(__name__)
+
+
 async def _broadcast_loop():
     while True:
         event = await _event_queue.get()
+        logger.info("Broadcasting '%s' to %d client(s)", event.get("type"), len(_clients))
         dead: set[WebSocket] = set()
         for client in list(_clients):
             try:
                 await client.send_json(event)
-            except Exception:
+            except Exception as exc:
+                logger.warning("send_json failed: %s", exc)
                 dead.add(client)
         _clients -= dead
 
