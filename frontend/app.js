@@ -57,7 +57,7 @@ function handleEvent(ev) {
 
     case "reader_removed":
       delete readers[ev.reader_id];
-      renderGrid();
+      onReaderRemoved(ev.reader_id);
       break;
 
     case "card_detected":
@@ -81,9 +81,9 @@ function renderGrid() {
 
   noReaders.style.display = ids.length === 0 ? "block" : "none";
 
-  // Remove stale cards
+  // Remove stale cards (skip ones already mid-animation)
   grid.querySelectorAll(".reader-card").forEach(el => {
-    if (!readers[el.dataset.readerId]) el.remove();
+    if (!readers[el.dataset.readerId] && !el.classList.contains("removing")) el.remove();
   });
 
   // Add new cards (existing ones stay untouched to preserve state)
@@ -196,6 +196,13 @@ function onReaderError(readerId, error) {
   el.className = "reader-card err-state";
   el.querySelector(".status-led").className  = "status-led error";
   el.querySelector(".status-text").textContent = "Error";
+}
+
+function onReaderRemoved(readerId) {
+  const el = cardEl(readerId);
+  if (!el) { renderGrid(); return; }
+  el.classList.add("removing");
+  el.addEventListener("animationend", () => { el.remove(); renderGrid(); }, { once: true });
 }
 
 function resetCard(el) {

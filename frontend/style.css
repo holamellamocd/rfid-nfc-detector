@@ -168,6 +168,17 @@ main {
 }
 .reader-card.flash { animation: card-flash .5s ease; }
 
+/* Remove animation */
+@keyframes card-remove {
+  0%   { opacity: 1; transform: scale(1);    filter: brightness(1); }
+  30%  { opacity: 1; transform: scale(1.02); filter: brightness(.7); }
+  100% { opacity: 0; transform: scale(.94);  filter: brightness(.4); }
+}
+.reader-card.removing {
+  animation: card-remove .45s ease forwards;
+  pointer-events: none;
+}
+
 /* ---- Card header ---- */
 .card-header {
   display: flex;
