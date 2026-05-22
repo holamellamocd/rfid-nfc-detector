@@ -114,7 +114,6 @@ class ReaderManager:
     # ------------------------------------------------------------------
 
     def _emit(self, event: dict):
-        logger.info("Emitting '%s' (queue id=%d)", event.get("type"), id(self._queue))
         self._loop.call_soon_threadsafe(self._queue.put_nowait, event)
 
     def get_state(self) -> list[dict]:

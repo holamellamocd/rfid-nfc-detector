@@ -39,21 +39,16 @@ logger = logging.getLogger(__name__)
 
 
 async def _broadcast_loop():
-    logger.info("Broadcast loop started (queue id=%d)", id(_event_queue))
-    try:
-        while True:
-            event = await _event_queue.get()
-            logger.info("Broadcasting '%s' to %d client(s)", event.get("type"), len(_clients))
-            dead: set[WebSocket] = set()
-            for client in list(_clients):
-                try:
-                    await client.send_json(event)
-                except Exception as exc:
-                    logger.warning("send_json failed: %s", exc)
-                    dead.add(client)
-            _clients.difference_update(dead)
-    except Exception as exc:
-        logger.error("Broadcast loop crashed: %s", exc, exc_info=True)
+    while True:
+        event = await _event_queue.get()
+        dead: set[WebSocket] = set()
+        for client in list(_clients):
+            try:
+                await client.send_json(event)
+            except Exception as exc:
+                logger.warning("send_json failed: %s", exc)
+                dead.add(client)
+        _clients.difference_update(dead)
 
 
 @app.websocket("/ws")
