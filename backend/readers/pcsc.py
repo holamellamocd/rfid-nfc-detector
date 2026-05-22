@@ -48,6 +48,7 @@ class PCSCReader(BaseReader):
         if not self._reader:
             self._resolve_reader()
             if not self._reader:
+                logger.debug("No reader resolved for %s", self._reader_name)
                 return None
 
         try:
@@ -64,7 +65,9 @@ class PCSCReader(BaseReader):
                 uid=uid,
                 raw_details={"atr": " ".join(f"{b:02X}" for b in atr)},
             )
-        except Exception:
+        except Exception as exc:
+            if "No smart card" not in str(exc) and "card not present" not in str(exc).lower():
+                logger.warning("PCSC scan error on %s: %s", self._reader_name, exc)
             return None
 
     def _read_uid(self, conn) -> str | None:

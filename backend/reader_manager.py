@@ -61,6 +61,8 @@ class ReaderManager:
         for port in find_uhf_candidate_ports():
             candidates.append((port, lambda p=port: UHFReader(p)))
 
+        logger.info("Discovery found %d candidate(s): %s", len(candidates), [c[0] for c in candidates])
+
         for reader_id, factory in candidates:
             with self._lock:
                 if reader_id in self._readers:
@@ -68,6 +70,7 @@ class ReaderManager:
                 try:
                     reader = factory()
                     self._readers[reader_id] = reader
+                    logger.info("Reader added: %s", reader_id)
                     self._emit({"type": "reader_added", "reader": reader.to_dict()})
                     threading.Thread(
                         target=self._reader_loop,
@@ -82,10 +85,12 @@ class ReaderManager:
     # ------------------------------------------------------------------
 
     def _reader_loop(self, reader):
+        logger.info("Scan loop started for: %s", reader.id)
         while self._running:
             try:
                 card = reader.scan()
                 if card:
+                    logger.info("Card detected on %s: %s %s", reader.id, card.protocol, card.uid)
                     self._emit(
                         {
                             "type": "card_detected",
